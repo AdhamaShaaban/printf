@@ -1,79 +1,41 @@
 #include "main.h"
 
 /**
- * _printf - print data to stdout according to a format.
- * @format: A string containing zero or more directives to print.
+ * get_precision - Calculates the precision for printing
+ * @format: Formatted string in which to print the arguments
+ * @i: List of arguments to be printed.
+ * @list: list of arguments.
  *
- * Return: the number of characters printed (excluding the null byte
- * used to end output to strings).
+ * Return: Precision.
  */
-int _printf(const char *format, ...)
+int get_precision(const char *format, int *i, va_list list)
 {
-	va_list list;
-	int i, j, len = 0;
-	char *str;
-	char c;
+	int curr_i = *i + 1;
+	int precision = -1;
 
-	va_start(list, format);
+	if (format[curr_i] != '.')
+		return (precision);
 
-	for (i = 0; format && format[i]; i++)
+	precision = 0;
+
+	for (curr_i += 1; format[curr_i] != '\0'; curr_i++)
 	{
-		if (format[i] != '%')
+		if (is_digit(format[curr_i]))
 		{
-			len += _putchar(format[i]);
-			continue;
+			precision *= 10;
+			precision += format[curr_i] - '0';
 		}
-
-		for (j = i + 1; format[j]; j++)
+		else if (format[curr_i] == '*')
 		{
-			if (is_valid_specifier(format[j]))
-				break;
-			if (is_valid_flag(format[j]))
-				continue;
-			if (is_digit(format[j]) || format[j] == '*')
-				break;
+			curr_i++;
+			precision = va_arg(list, int);
+			break;
 		}
-
-		if (!format[j])
-			return (-1);
-
-		c = format[j];
-
-		switch (c)
-		{
-			case 'c':
-				len += print_char(format[i + 1], list);
-				i = j;
-				break;
-			case 's':
-				str = va_arg(list, char *);
-				len += print_string(str, format, &i);
-				i = j;
-				break;
-			case 'd':
-			case 'i':
-				len += print_number(format[i], c, list, format, &i);
-				i = j;
-				break;
-			case 'u':
-			case 'o':
-			case 'x':
-			case 'X':
-				len += print_unsigned_number(format[i], c, list, format, &i);
-				i = j;
-				break;
-			case '%':
-				len += _putchar('%');
-				i = j;
-				break;
-			default:
-				len += print_unknown_specifier(format[i], c);
-				i = j;
-				break;
-		}
+		else
+			break;
 	}
 
-	va_end(list);
+	*i = curr_i - 1;
 
-	return (len);
+	return (precision);
 }
