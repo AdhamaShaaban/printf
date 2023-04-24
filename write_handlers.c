@@ -26,7 +26,6 @@ int handle_write_char(char c, char buffer[],
 
 	buffer[i++] = c;
 	buffer[i] = '\0';
-
 	if (width > 1)
 	{
 		buffer[BUFF_SIZE - 1] = '\0';
@@ -43,7 +42,6 @@ int handle_write_char(char c, char buffer[],
 
 	return (write(1, &buffer[0], 1));
 }
-
 /************************* WRITE NUMBER *************************/
 /**
  * write_number - Prints a string
